@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyX UI Editor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@400;500;600&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="langOverlay" class="lang-overlay">
+    <div class="lang-box">
+      <div class="lang-logo">NyX</div>
+      <h1>NyX UI Editor</h1>
+      <p>Choose Your Language / زبان خود را انتخاب کنید</p>
+      <div class="lang-btns">
+        <button class="lang-btn" data-lang="en"><span>🇺🇸</span> English</button>
+        <button class="lang-btn" data-lang="fa"><span>🇮🇷</span> فارسی</button>
+        <button class="lang-btn" data-lang="ar"><span>🇸🇦</span> العربية</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="projectsOverlay" class="lang-overlay hidden">
+    <div class="projects-box">
+      <div class="projects-head">
+        <div>
+          <div class="lang-logo" style="margin:0 0 12px">NyX</div>
+          <h1 id="projTitle">Recent Projects</h1>
+          <p id="projSub" style="color:var(--muted);font-size:13px;margin:0">Auto-saved locally in this browser</p>
+        </div>
+        <button class="btn btn-primary" id="btnNewProject" style="padding:12px 22px;font-size:14px">+ New</button>
+      </div>
+      <div id="projectsList" class="projects-list"></div>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="logo"><span class="logo-icon">NyX</span> <span>UI Editor</span></div>
+      <div class="top-actions">
+        <button class="btn btn-icon" id="undoBtn" title="Undo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6.36 2.64L3 13"/></svg>
+        </button>
+        <button class="btn btn-icon" id="redoBtn" title="Redo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016.36 2.64L21 13"/></svg>
+        </button>
+        <div class="sep"></div>
+        <div class="align-bar" title="Select 2+ items (Shift+Click)">
+          <button class="btn btn-icon btn-sm" id="alignLeft" title="Align Left">⫷</button>
+          <button class="btn btn-icon btn-sm" id="alignHCenter" title="Align Center H">⬌</button>
+          <button class="btn btn-icon btn-sm" id="alignRight" title="Align Right">⫸</button>
+          <button class="btn btn-icon btn-sm" id="alignTop" title="Align Top">⬆</button>
+          <button class="btn btn-icon btn-sm" id="alignVCenter" title="Align Middle">⬍</button>
+          <button class="btn btn-icon btn-sm" id="alignBottom" title="Align Bottom">⬇</button>
+          <div class="sep"></div>
+          <button class="btn btn-ghost btn-sm" id="distH" title="Distribute Horizontal">Distribute H</button>
+          <button class="btn btn-ghost btn-sm" id="distV" title="Distribute Vertical">Distribute V</button>
+          <input type="number" id="gapInput" value="16" min="0" max="500" title="Gap px" style="width:48px;padding:3px 6px;background:var(--panel);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px">
+          <button class="btn btn-ghost btn-sm" id="gapH" title="Equal gap horizontal">Gap H</button>
+          <button class="btn btn-ghost btn-sm" id="gapV" title="Equal gap vertical">Gap V</button>
+          <button class="btn btn-ghost btn-sm" id="sameLineH" title="Put on same horizontal line">Same Line</button>
+        </div>
+        <div class="sep"></div>
+        <button class="btn btn-ai" id="aiBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg> <span data-i18n="ai">AI Generate</span></button>
+        <button class="btn btn-ghost" id="clearBtn"><span data-i18n="clear">Clear</span></button>
+        <span id="autosaveBadge"></span>
+        <button class="btn btn-ghost" id="saveNyxBtn" title="Save project .nyx">Save .nyx</button>
+        <button class="btn btn-ghost" id="openNyxBtn" title="Open project .nyx">Open .nyx</button>
+        <input type="file" id="nyxFileInput" accept=".nyx,application/json" style="display:none">
+        <button class="btn btn-ghost" id="exportImgBtn"><span>Export Image</span></button>
+        <button class="btn btn-ghost" id="exportLuaImgBtn"><span>Export Lua+Images</span></button>
+        <button class="btn btn-primary" id="exportBtn"><span data-i18n="export">Export Lua</span></button>
+        <button class="btn btn-icon" id="langBtn" title="Language">🌐</button>
+      </div>
+    </header>
+
+    <div class="main">
+      <aside class="sidebar left">
+        <div class="tabs">
+          <button class="tab active" data-tab="comp" data-i18n="components">Components</button>
+          <button class="tab" data-tab="icons" data-i18n="icons">Icons</button>
+          <button class="tab" data-tab="preset" data-i18n="presets">Presets</button>
+          <button class="tab" data-tab="layer" data-i18n="layers">Layers</button>
+        </div>
+        <div class="tab-pane" id="pane-comp">
+          <div class="sec-title" data-i18n="shapes">Shapes</div>
+          <div class="grid">
+            <div class="item" data-type="rectangle" draggable="true"><div class="ico">▭</div><span data-i18n="rect">Rectangle</span></div>
+            <div class="item" data-type="square" draggable="true"><div class="ico">■</div><span data-i18n="square">Square</span></div>
+            <div class="item" data-type="circle" draggable="true"><div class="ico">●</div><span data-i18n="circle">Circle</span></div>
+            <div class="item" data-type="triangle" draggable="true"><div class="ico">▲</div><span data-i18n="triangle">Triangle</span></div>
+            <div class="item" data-type="line" draggable="true"><div class="ico">─</div><span data-i18n="line">Line</span></div>
+            <div class="item" data-type="rhombus" draggable="true"><div class="ico">◆</div><span data-i18n="rhombus">Rhombus</span></div>
+          </div>
+          <div class="sec-title" data-i18n="controls">Controls</div>
+          <div class="grid">
+            <div class="item" data-type="button" draggable="true"><div class="ico">▢</div><span data-i18n="button">Button</span></div>
+            <div class="item" data-type="label" draggable="true"><div class="ico">T</div><span data-i18n="label">Label</span></div>
+            <div class="item" data-type="editbox" draggable="true"><div class="ico">▭</div><span data-i18n="editbox">Edit Box</span></div>
+            <div class="item" data-type="checkbox" draggable="true"><div class="ico">☑</div><span data-i18n="checkbox">Checkbox</span></div>
+            <div class="item" data-type="progress" draggable="true"><div class="ico">▬</div><span data-i18n="progress">Progress</span></div>
+            <div class="item" data-type="image" draggable="true"><div class="ico">🖼</div><span data-i18n="image">Image</span></div>
+          </div>
+        </div>
+        <div class="tab-pane hidden" id="pane-icons">
+          <div class="sec-title">SVG Icons (click to add)</div>
+          <input type="search" id="iconsSearch" placeholder="Search icons... / جستجوی آیکون">
+          <div style="padding:6px">
+            <button class="btn btn-ghost" id="btnUploadIcon" style="width:100%;justify-content:center;margin-bottom:6px">+ Upload Icons (files)</button>
+            <button class="btn btn-ghost" id="btnUploadIconFolder" style="width:100%;justify-content:center;margin-bottom:8px">+ Import Folder</button>
+            <input type="file" id="fileIconInput" accept="image/*,.svg" multiple style="display:none">
+            <input type="file" id="fileIconFolder" accept="image/*,.svg" multiple webkitdirectory directory style="display:none">
+          </div>
+          <div class="icon-grid hud-icons" id="iconsTabGrid"></div>
+        </div>
+        <div class="tab-pane hidden" id="pane-preset">
+          <div class="sec-title" data-i18n="readyBtns">Ready Buttons</div>
+          <div class="preset-list">
+            <div class="preset" data-preset="submit"><span class="pbtn green">Submit</span></div>
+            <div class="preset" data-preset="cancel"><span class="pbtn red">Cancel</span></div>
+            <div class="preset" data-preset="select"><span class="pbtn blue">Select</span></div>
+            <div class="preset" data-preset="confirm"><span class="pbtn purple">Confirm</span></div>
+            <div class="preset" data-preset="close"><span class="pbtn dark">✕ Close</span></div>
+            <div class="preset" data-preset="next"><span class="pbtn blue">Next →</span></div>
+            <div class="preset" data-preset="back"><span class="pbtn gray">← Back</span></div>
+            <div class="preset" data-preset="buy"><span class="pbtn green">Buy</span></div>
+          </div>
+          <div class="sec-title" data-i18n="hudIcons">HUD Icons</div>
+          <div class="icon-grid hud-icons">
+            <div class="preset icon" data-preset="icon_hp" title="HP / Health">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#ef4444" d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c1.74 0 3.41 1.01 4.5 2.09C12.09 6.01 13.76 5 15.5 5 19 5 21.5 8.5 21.5 12.5 19 16.65 12 21 12 21z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_armor" title="Armor">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#3b82f6" d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 2.18l6 2.25v4.66c0 3.82-2.51 7.4-6 8.48-3.49-1.08-6-4.66-6-8.48V6.43l6-2.25z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_food" title="Food / Hunger">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#f59e0b" d="M18.06 3a4.94 4.94 0 00-3.53 1.46L12 7l-2.53-2.54A5 5 0 005.94 3H4v2h1.94a3 3 0 012.12.88L11 8.8V21h2V8.8l2.94-2.92A3 3 0 0118.06 5H20V3h-1.94z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_water" title="Water / Thirst">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#06b6d4" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_warn" title="Warning">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#f59e0b" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_success" title="Success">
+              <svg viewBox="0 0 24 24" width="22" height="22"><circle fill="#22c55e" cx="12" cy="12" r="10"/><path fill="#fff" d="M10 15.5l-3.5-3.5 1.4-1.4L10 12.7l5.6-5.6 1.4 1.4L10 15.5z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_error" title="Error">
+              <svg viewBox="0 0 24 24" width="22" height="22"><circle fill="#ef4444" cx="12" cy="12" r="10"/><path fill="#fff" d="M15.5 8.5l-1.4-1.4L12 9.2 9.9 7.1 8.5 8.5 10.6 10.6 8.5 12.7l1.4 1.4L12 12l2.1 2.1 1.4-1.4L13.4 10.6z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_info" title="Info">
+              <svg viewBox="0 0 24 24" width="22" height="22"><circle fill="#3b82f6" cx="12" cy="12" r="10"/><path fill="#fff" d="M11 7h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_x" title="Close">
+              <svg viewBox="0 0 24 24" width="22" height="22"><circle fill="#333" cx="12" cy="12" r="10"/><path fill="#fff" stroke="#fff" stroke-width="1.5" d="M15.5 8.5l-7 7M8.5 8.5l7 7"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_star" title="Star">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#f59e0b" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_lock" title="Lock">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#a78bfa" d="M18 8h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6zm3 11a2 2 0 110-4 2 2 0 010 4z"/></svg>
+            </div>
+            <div class="preset icon" data-preset="icon_user" title="User">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#94a3b8" d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/></svg>
+            </div>
+          </div>
+          <div class="sec-title" data-i18n="panels">Panels</div>
+          <div class="preset-list">
+            <div class="preset" data-preset="panel_dark"><span class="ppanel dark"></span> <span data-i18n="darkPanel">Dark Panel</span></div>
+            <div class="preset" data-preset="panel_glass"><span class="ppanel glass"></span> <span data-i18n="glassPanel">Glass</span></div>
+            <div class="preset" data-preset="panel_card"><span class="ppanel card"></span> <span data-i18n="card">Card</span></div>
+          </div>
+          <div class="sec-title">Characters / کاراکتر</div>
+          <div class="preset-list">
+            <div class="preset" data-preset="char_male"><span class="pbtn gray">Male</span></div>
+            <div class="preset" data-preset="char_female"><span class="pbtn gray">Female</span></div>
+            <div class="preset" data-preset="char_cj"><span class="pbtn blue">CJ Style</span></div>
+            <div class="preset" data-preset="char_cop"><span class="pbtn blue">Cop</span></div>
+            <div class="preset" data-preset="char_medic"><span class="pbtn red">Medic</span></div>
+            <div class="preset" data-preset="char_biker"><span class="pbtn purple">Biker</span></div>
+          </div>
+          <div class="sec-title">Upload Image</div>
+          <div class="preset-list">
+            <div class="preset" id="btnUploadImg"><span class="pbtn green">+ Upload Image</span></div>
+          </div>
+        </div>
+        <div class="tab-pane hidden" id="pane-layer">
+          <div id="layersList" class="layers"><div class="empty" data-i18n="noLayers">No layers yet</div></div>
+        </div>
+      </aside>
+
+      <main class="canvas-area">
+        <div class="canvas-bar">
+          <div class="res-controls">
+            <label>W</label><input type="number" id="resW" value="1920" min="320" max="7680" step="10">
+            <span>×</span>
+            <label>H</label><input type="number" id="resH" value="1080" min="240" max="4320" step="10">
+            <label class="scale-check" title="Scale all layers to new resolution"><input type="checkbox" id="resScale" checked> Scale UI</label>
+            <button class="btn btn-ghost btn-sm" id="resApply">Apply</button>
+            <button class="btn btn-ghost btn-sm res-preset" data-w="1280" data-h="720">720p</button>
+            <button class="btn btn-ghost btn-sm res-preset" data-w="1920" data-h="1080">1080p</button>
+            <button class="btn btn-ghost btn-sm res-preset" data-w="2560" data-h="1440">2K</button>
+            <button class="btn btn-ghost btn-sm res-preset" data-w="3840" data-h="2160">4K</button>
+            <button class="btn btn-ghost btn-sm res-preset" data-w="5760" data-h="3240">6K</button>
+            <button class="btn btn-ghost btn-sm res-preset" data-w="7680" data-h="4320">8K</button>
+          </div>
+          <div class="zoom">
+            <button id="zoomOut" class="btn btn-icon btn-sm">−</button>
+            <span id="zoomVal">100%</span>
+            <button id="zoomIn" class="btn btn-icon btn-sm">+</button>
+          </div>
+        </div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <div class="canvas" id="canvas">
+            <div class="game-bg"></div>
+            <div id="guides" class="guides">
+              <div class="guide-v center"></div>
+              <div class="guide-h center"></div>
+            </div>
+            <div id="els"></div>
+            <div id="measureLayer" class="measure-layer"></div>
+          </div>
+        </div>
+        <div class="hint" data-i18n="hint">Drag components onto the canvas</div>
+      </main>
+
+      <aside class="sidebar right">
+        <div class="props-head" data-i18n="properties">Properties</div>
+        <div id="props" class="props"><div class="empty-props" data-i18n="selectEl">Select an element</div></div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="aiModal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head"><h3 data-i18n="aiTitle">AI Generate</h3><button class="x" id="aiClose">×</button></div>
+      <div class="modal-body">
+        <textarea id="aiPrompt" rows="3"></textarea>
+        <div id="aiPresets" class="ai-presets"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="aiCancel" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-ai" id="aiRun" data-i18n="generate">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="exportModal" class="modal hidden">
+    <div class="modal-box wide">
+      <div class="modal-head"><h3 data-i18n="exportTitle">Export Lua</h3><button class="x" id="exClose">×</button></div>
+      <div class="modal-body"><pre id="exCode"></pre></div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="exCancel" data-i18n="close">Close</button>
+        <button class="btn btn-primary" id="exCopy" data-i18n="copy">Copy</button>
+        <button class="btn btn-primary" id="exDl" data-i18n="download">Download</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="nameProjectModal" class="modal hidden">
+    <div class="modal-box" style="width:380px">
+      <div class="modal-head"><h3 id="nameProjTitle">New Project</h3><button type="button" class="x" id="nameProjClose">×</button></div>
+      <div class="modal-body">
+        <label style="font-size:12px;color:var(--muted)" id="nameProjLabel">Project name</label>
+        <input class="inp" id="nameProjInput" type="text" placeholder="My UI..." style="margin-top:8px">
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" id="nameProjCancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="nameProjOk">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+
+  <input type="file" id="fileImageInput" accept="image/*" multiple style="display:none">
+</body>
+</html>
