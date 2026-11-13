@@ -89,3 +89,5 @@ Built with:
 ## License
 
 MIT License – feel free to use, modify and distribute.
+این پروژه با کمک هوش مصنوعی ساخته شده است.
+This project was created with the help of AI.
