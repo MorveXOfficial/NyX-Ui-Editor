@@ -34,7 +34,7 @@ Just open `index.html` in a modern browser (Chrome / Edge / Firefox).
 ### Local
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/nyx-ui-editor.git
+git clone https://github.com/MorveXOfficial/nyx-ui-editor.git
 cd nyx-ui-editor
 
 # Serve with any static server (example with Python)
